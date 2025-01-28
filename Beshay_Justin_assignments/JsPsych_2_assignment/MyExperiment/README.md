@@ -5,6 +5,7 @@ Here is where the assignment files are held!
 
 experiment.html is where you will find the code for the "Hello World" assignment/tutorial. 
 myNewExperiment holds the code for the reaction time assignment. 
+
    -- For my myNewExperiment to run, you should download the img folder, which includes the images required to display the orange and blue 
       shapes.     
      
