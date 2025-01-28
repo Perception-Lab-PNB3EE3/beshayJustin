@@ -8,5 +8,4 @@ myNewExperiment holds the code for the reaction time assignment.
 
    -- For my myNewExperiment to run, you should download the img folder, which includes the images required to display the orange and blue 
       shapes.     
-     
-   -- Also, Make sure to download and host (import) jspsych on your local repository so that the file can run!
+   -- Also, Make sure to download and host (import) jspsych on your local repository so that myNewExperiment can run!
