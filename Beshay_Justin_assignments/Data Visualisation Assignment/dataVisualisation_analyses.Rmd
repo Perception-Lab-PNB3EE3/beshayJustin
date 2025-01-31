@@ -1,0 +1,122 @@
+---
+title: "Data Visualisation Assignment - Justin Beshay"
+output: 
+  pdf_document: default
+  html_notebook: default
+---
+# 1. Load in the assignments_dataVis_dataset.csv file.
+```{r}
+read.csv("assignment_dataVis_dataset.csv")
+dataset <- read.csv("assignment_dataVis_dataset.csv")
+
+dataset$condition <- as.factor(dataset$condition)
+
+# Subset the dataset for condition_1
+condition_1_data <- subset(dataset, condition == "condition_1")
+condition_2_data <- subset(dataset, condition == "condition_2")
+condition_3_data <- subset(dataset, condition == "condition_3")
+condition_4_data <- subset(dataset, condition == "condition_4")
+
+```
+Here, I load in the dataset and make it to a readable variable to see the dataframe. I then converted the condition column into a factor so R treats it as a categorical variable rather than text. I then create separate dataframes for each condition. This makes it easier to analyze them individually and find out the mean and standard deviation.
+
+
+
+
+# 2. Summary Statistics for Each Condition
+```{r include=FALSE}
+# Compute mean and SD for x and y in condition_1
+mean_x_condition1 <- mean(condition_1_data$x, na.rm = TRUE)
+sd_x_condition1 <- sd(condition_1_data$x, na.rm = TRUE)
+
+mean_y_condition1 <- mean(condition_1_data$y, na.rm = TRUE)
+sd_y_condition1 <- sd(condition_1_data$y, na.rm = TRUE)
+
+# Compute mean and SD for x and y in condition_2
+mean_x_condition2 <- mean(condition_2_data$x, na.rm = TRUE)
+sd_x_condition2 <- sd(condition_2_data$x, na.rm = TRUE)
+
+mean_y_condition2 <- mean(condition_2_data$y, na.rm = TRUE)
+sd_y_condition2 <- sd(condition_2_data$y, na.rm = TRUE)
+
+# Compute mean and SD for x and y in condition_3
+mean_x_condition3 <- mean(condition_3_data$x, na.rm = TRUE)
+sd_x_condition3 <- sd(condition_3_data$x, na.rm = TRUE)
+
+mean_y_condition3 <- mean(condition_3_data$y, na.rm = TRUE)
+sd_y_condition3 <- sd(condition_3_data$y, na.rm = TRUE)
+
+# Compute mean and SD for x and y in condition_4
+mean_x_condition4 <- mean(condition_4_data$x, na.rm = TRUE)
+sd_x_condition4 <- sd(condition_4_data$x, na.rm = TRUE)
+
+mean_y_condition4 <- mean(condition_4_data$y, na.rm = TRUE)
+sd_y_condition4 <- sd(condition_4_data$y, na.rm = TRUE)
+```
+
+```{r}
+# Create a summary table
+summary_table <- data.frame(
+  Condition = c("Condition 1", "Condition 2", "Condition 3", "Condition 4"),
+  Mean_X = c(mean(condition_1_data$x, na.rm = TRUE),
+             mean(condition_2_data$x, na.rm = TRUE),
+             mean(condition_3_data$x, na.rm = TRUE),
+             mean(condition_4_data$x, na.rm = TRUE)),
+  SD_X = c(sd(condition_1_data$x, na.rm = TRUE),
+           sd(condition_2_data$x, na.rm = TRUE),
+           sd(condition_3_data$x, na.rm = TRUE),
+           sd(condition_4_data$x, na.rm = TRUE)),
+  Mean_Y = c(mean(condition_1_data$y, na.rm = TRUE),
+             mean(condition_2_data$y, na.rm = TRUE),
+             mean(condition_3_data$y, na.rm = TRUE),
+             mean(condition_4_data$y, na.rm = TRUE)),
+  SD_Y = c(sd(condition_1_data$y, na.rm = TRUE),
+           sd(condition_2_data$y, na.rm = TRUE),
+           sd(condition_3_data$y, na.rm = TRUE),
+           sd(condition_4_data$y, na.rm = TRUE))
+)
+# Print the table
+print(summary_table)
+```
+This Table displays all the means and Standard deviations from each condition in the dataset.
+
+# 3. Visualization of conditions 
+```{r}
+
+# Load dataset from your provided path
+data <- read.csv("assignment_dataVis_dataset.csv")
+
+## Load required library
+library(ggplot2)
+
+# Ensure condition is treated as a factor
+data$condition <- as.factor(data$condition)
+
+# Scatter plot with facet wrap for each condition
+ggplot(data, aes(x = x, y = y)) +
+  geom_point(alpha = 0.5, color = "blue") +  # Add points with some transparency
+  facet_wrap(~ condition) +  # Create separate plots for each condition
+  labs(title = "Scatter Plots for Each Condition", x = "X", y = "Y") +
+  theme_minimal()
+
+```
+
+# Questions. 
+### What can be concluded from the dataset?
+At first I thought the data set was just a bunch of random points, trying to make a line or something trying to show differences in points, But after separating and visualizing each condition the data in the conditions make a bunch of different shapes!
+Condition 1 points made a T-rex, 
+Condition 2 points made a Galaxy, 
+Condition 3 points made 5 separate parallel lines, and 
+Condition 4 points made a Star!
+
+
+### What did you find most challenging about this assignment?
+What I found most challenging about this assignment was the visualization. I first had the thought to display every condition on 1 graph, but that was too messy and I could not see any trends. After trying out multiple types of visualization, I decided to try and visualize each condition individually which finally gave me the clear picture (literally and figuratively)! 
+
+### What did you learn in completing this assignment? What are you still curious about?
+In this assignment I learnt greatly about R notebook. I wish we used this in our other statistics classes because I can display my code and thought process/explanation behind it so that it is more clear! I also learnt a lot about visualization and how it is important to use the appropriate visualization in order to see the data clearly. 
+
+### Why is it important to visualize data?
+it is important to visualize data because it sginificantly helps with understanding, interpreting, predicting, and making decisions about data. We visualize data to understand what statistical tests and models are appropriate. But be careful, because not all visualizations are appropriate for the data you are looking at.
+
+
