@@ -1,11 +1,13 @@
 ---
 title: "My Pre-Registration"
-output:
-
+output: 
+  
+  html_document: default
   md_document: 
         variant: markdown_github
-  html_document: default
   pdf_document: default
+bibliography: references.bib
+csl: apa.csl  
 ---
 
 # Pre-registration Template
@@ -374,25 +376,6 @@ We will examine whether recall speed (total recall time) is associated with reca
 
 # References
 
-Carr, S. M., & Rickard, N. S. (2016). The use of emotionally arousing music to enhance memory for subsequently presented images. Psychology of Music, 44(5), 1145-1157. https://doi.org/10.1177/0305735615613846
-
-Chew, A. S.-Q., Yu, Y.-T., Chua, S.-W., & Gan, S. K.-E. (2016). The effects of familiarity and language of background music on working memory and language tasks in Singapore. Psychology of Music, 44(6), 1431-1438. https://doi.org/10.1177/0305735616636209
-
-Christopher, E. A., & Shelton, J. T. (2017). Individual differences in working memory predict the effect of music on student performance. Journal of Applied Research in Memory and Cognition, 6(2), 167–173. https://doi.org/10.1016/j.jarmac.2017.01.012
-
-Echaide, C., del Río, D., & Pacios, J. (2019). The differential effect of background music on memory for verbal and visuospatial information. The Journal of General Psychology, 146(4), 443–458. https://doi.org/10.1080/00221309.2019.1602023
-
-Furnham, A., & Strbac, L. (2002). Music is as distracting as noise: The differential distraction of background music and noise on the cognitive test performance of introverts and extraverts. Ergonomics, 45(3), 203–217. https://doi.org/10.1080/00140130210121932
-
-Gonzalez, M. F., & Aiello, J. R. (2019). More than meets the ear: Investigating how music affects cognitive task performance. Journal of Experimental Psychology: Applied, 25(3), 431-444. https://doi.org/10.1037/xap0000202
-
-Lehmann, J. A. M., & Seufert, T. (2017). The influence of background music on learning in the light of different theoretical perspectives and the role of working memory capacity. Frontiers in Psychology, 8, 1902. https://doi.org/10.3389/fpsyg.2017.01902
-
-Mammarella, N., Fairfield, B., & Cornoldi, C. (2007). Does music enhance cognitive performance in healthy older adults? The Vivaldi effect. Aging Clinical and Experimental Research, 19(5), 394–399. https://doi.org/10.1007/BF03324720
-
-Souza, A. S., & Leal Barbosa, L. C. (2023). Should we turn off the music? Music with lyrics interferes with cognitive tasks. Journal of Cognition, 6(1), 24. https://doi.org/10.5334/joc.273
-
-Taheri, S., Razeghi, M., Choobineh, A., Kazemi, R., Rasipisheh, P., & Vali, M. (2022). Investigating the effect of background music on cognitive and skill performance: A cross-sectional study. Work, 71(4), 871–879. https://doi.org/10.3233/WOR-213631
 
 
 

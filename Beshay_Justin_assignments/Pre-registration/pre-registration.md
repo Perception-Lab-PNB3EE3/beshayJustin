@@ -60,41 +60,41 @@ prior research has produced mixed findings on whether background
 noise—particularly music—enhances or impairs memory performance. Some
 studies suggest that background music can improve cognitive performance
 by enhancing mood, increasing arousal, and reducing stress, which may
-facilitate attention and encoding processes \[@carr2016;
-@mammarella2007; @taheri2022\]. Others argue that background music can
-be distracting, as it competes for attentional resources needed for
-memory encoding and retrieval, leading to impaired recall accuracy
-\[@lehmann2017; @echaide2019\]. Given these conflicting findings,
-further research is needed to clarify how different types of background
-noise influence memory retention.
+facilitate attention and encoding processes (Carr & Rickard, 2016;
+Mammarella et al., 2007; Taheri et al., 2022). Others argue that
+background music can be distracting, as it competes for attentional
+resources needed for memory encoding and retrieval, leading to impaired
+recall accuracy (Echaide et al., 2019; Lehmann & Seufert, 2017). Given
+these conflicting findings, further research is needed to clarify how
+different types of background noise influence memory retention.
 
 One major limitation in the existing literature is the variability in
 study designs, including differences in music type, volume, complexity,
 and familiarity. For example, studies using instrumental music have
 sometimes found no effect or even benefits for memory, whereas music
-with lyrics has been shown to disrupt verbal processing tasks
-\[@souza2023\]. The familiarity of the music may also be a key
+with lyrics has been shown to disrupt verbal processing tasks (Souza &
+Leal Barbosa, 2023). The familiarity of the music may also be a key
 factor—highly familiar songs may induce involuntary engagement, such as
 singing along or anticipating lyrics, which could increase cognitive
-load and reduce memory performance \[@chew2016\]. Additionally, the
-complexity of the music (e.g., fast tempo, unpredictable melodies) may
-influence its impact on recall, with high-complexity music likely being
-more disruptive than simple, ambient sounds \[@gonzalez2019\]. These
-inconsistencies highlight the need for a systematic investigation that
-directly compares the effects of different background noise conditions
-under controlled experimental conditions.
+load and reduce memory performance (Chew et al., 2016). Additionally,
+the complexity of the music (e.g., fast tempo, unpredictable melodies)
+may influence its impact on recall, with high-complexity music likely
+being more disruptive than simple, ambient sounds (Gonzalez & Aiello,
+2019). These inconsistencies highlight the need for a systematic
+investigation that directly compares the effects of different background
+noise conditions under controlled experimental conditions.
 
 Another important gap in the literature is the role of individual
 differences in study habits. Some students habitually study with music,
 while others prefer silence, raising the question of whether Frequent
 music listeners are less distracted by background music while studying
-compared to those who usually study in silence \[@furnham2002\]. If
-frequent music listeners develop adaptations to studying with noise,
+compared to those who usually study in silence (Furnham & Strbac, 2002).
+If frequent music listeners develop adaptations to studying with noise,
 their recall performance may be less negatively impacted than those who
 are accustomed to studying in quiet environments. However, this remains
 an open question, as relatively few studies have considered study habits
 as a moderating variable in memory research when interacting with
-music/noise \[@christopher2017\].
+music/noise (Christopher & Shelton, 2017).
 
 The present study aims to clarify these mixed findings by systematically
 examining how three background noise conditions—silence, white noise,
@@ -310,7 +310,7 @@ install.packages("pwr")
 
     ## 
     ## The downloaded binary packages are in
-    ##  /var/folders/6r/hs8r3gpd735bllzj7859ndfw0000gn/T//RtmpixvLMd/downloaded_packages
+    ##  /var/folders/6r/hs8r3gpd735bllzj7859ndfw0000gn/T//RtmpfFAsej/downloaded_packages
 
 ``` r
 install.packages("pwr")  
@@ -318,7 +318,7 @@ install.packages("pwr")
 
     ## 
     ## The downloaded binary packages are in
-    ##  /var/folders/6r/hs8r3gpd735bllzj7859ndfw0000gn/T//RtmpixvLMd/downloaded_packages
+    ##  /var/folders/6r/hs8r3gpd735bllzj7859ndfw0000gn/T//RtmpfFAsej/downloaded_packages
 
 ``` r
 library(pwr)
@@ -646,3 +646,52 @@ Taheri, S., Razeghi, M., Choobineh, A., Kazemi, R., Rasipisheh, P., &
 Vali, M. (2022). Investigating the effect of background music on
 cognitive and skill performance: A cross-sectional study. Work, 71(4),
 871–879. <https://doi.org/10.3233/WOR-213631>
+
+Carr, S. M., & Rickard, N. S. (2016). The use of emotionally arousing
+music to enhance memory for subsequently presented images. *Psychology
+of Music*, *44*(5), 1145–1157.
+<https://doi.org/10.1177/0305735615613846>
+
+Chew, A. S.-Q., Yu, Y.-T., Chua, S.-W., & Gan, S. K.-E. (2016). The
+effects of familiarity and language of background music on working
+memory and language tasks in singapore. *Psychology of Music*, *44*(6),
+1431–1438. <https://doi.org/10.1177/0305735616636209>
+
+Christopher, E. A., & Shelton, J. T. (2017). Individual differences in
+working memory predict the effect of music on student performance.
+*Journal of Applied Research in Memory and Cognition*, *6*(2), 167–173.
+<https://doi.org/10.1016/j.jarmac.2017.01.012>
+
+Echaide, C., Río, D. del, & Pacios, J. (2019). The differential effect
+of background music on memory for verbal and visuospatial information.
+*The Journal of General Psychology*, *146*(4), 443–458.
+<https://doi.org/10.1080/00221309.2019.1602023>
+
+Furnham, A., & Strbac, L. (2002). Music is as distracting as noise: The
+differential distraction of background music and noise on the cognitive
+test performance of introverts and extraverts. *Ergonomics*, *45*(3),
+203–217. <https://doi.org/10.1080/00140130210121932>
+
+Gonzalez, M. F., & Aiello, J. R. (2019). More than meets the ear:
+Investigating how music affects cognitive task performance. *Journal of
+Experimental Psychology: Applied*, *25*(3), 431–444.
+<https://doi.org/10.1037/xap0000202>
+
+Lehmann, J. A. M., & Seufert, T. (2017). The influence of background
+music on learning in the light of different theoretical perspectives and
+the role of working memory capacity. *Frontiers in Psychology*, *8*,
+1902. <https://doi.org/10.3389/fpsyg.2017.01902>
+
+Mammarella, N., Fairfield, B., & Cornoldi, C. (2007). Does music enhance
+cognitive performance in healthy older adults? The vivaldi effect.
+*Aging Clinical and Experimental Research*, *19*(5), 394–399.
+<https://doi.org/10.1007/BF03324720>
+
+Souza, A. S., & Leal Barbosa, L. C. (2023). Should we turn off the
+music? Music with lyrics interferes with cognitive tasks. *Journal of
+Cognition*, *6*(1), 24. <https://doi.org/10.5334/joc.273>
+
+Taheri, S., Razeghi, M., Choobineh, A., Kazemi, R., Rasipisheh, P., &
+Vali, M. (2022). Investigating the effect of background music on
+cognitive and skill performance: A cross-sectional study. *Work*,
+*71*(4), 871–879. <https://doi.org/10.3233/WOR-213631>
