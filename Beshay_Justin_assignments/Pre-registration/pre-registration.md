@@ -142,12 +142,12 @@ background noise could serve as a cognitive aid in educational contexts.
     than instrumental music, as processing lyrics competes with the
     cognitive resources required for studying and recall.
 
-1.  Long-Term Retention Hypothesis (Directional): Participants who study
+3.  Long-Term Retention Hypothesis (Directional): Participants who study
     in the silence condition will exhibit better long-term retention of
     studied material compared to those in the music and white noise
     conditions.
 
-2.  Interaction Hypothesis: The impact of background noise on recall
+4.  Interaction Hypothesis: The impact of background noise on recall
     accuracy will vary depending on individual differences in study
     habits (e.g., whether participants frequently listen to music while
     studying).
