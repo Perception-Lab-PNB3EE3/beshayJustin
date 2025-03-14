@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">  <!-- ensures that any special characters (like accents or symbols) are displayed properly. -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- content is sized correctly on all devices ---> 
+    <title>Background Noise Experiment</title>  <!-- Title of the experiment in the browser tab.-->
+
+    <!-- Load jsPsych (Latest Version) -->
+    <script src="https://unpkg.com/jspsych@8.2.1"></script>
+
+    <!-- Load jsPsych Plugins -->
+    <script src="https://unpkg.com/@jspsych/plugin-preload"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-audio-keyboard-response"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-text"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-likert"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-randomization"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-html-form"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-call-function"></script>
+     <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice"></script>
+
+
+    <!-- Load jsPsych CSS -->
+    <link href="https://unpkg.com/jspsych@8.2.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <script>
+        // Initialize jsPsych
+        const jsPsych = initJsPsych();
+
+          // Random condition assignment
+    const conditions = ['silence', 'white_noise', 'music'];
+    const assignedCondition = jsPsych.randomization.sampleWithoutReplacement(conditions, 1)[0]; //Randomly select one condition. Each participant is assigned to only one condition.
+    console.log("Assigned condition:", assignedCondition); 
+ 
+  // Store condition as a data trial (for CSV export) without showing the condition to the paricipant
+const conditionTrial = {
+    type: jsPsychCallFunction,
+    func: () => {
+        return { 
+            condition: assignedCondition, 
+            task: 'condition_info' 
+        };
+    }
+};
+
+    // Preload audio files if not silence
+    const preload = {
+        type: jsPsychPreload,
+        audio: assignedCondition === 'silence' ? [] : [assignedCondition + '.mp3']
+    };
+
+      // Welcome Screen with Eligibility Checklist
+const welcome = {
+    type: jsPsychSurveyMultiChoice, // have to check eligiblity to move on
+    preamble: `
+        <h2>Welcome to the Background Noise and Memory Study</h2>
+        <p>Thank you for taking part in this private study designed for educational purposes. 
+        You will be asked to memorize a list of words while either music, white noise, or silence plays in the background. 
+        Afterward, you'll complete a brief math distraction task, a waiting room, then recall as many words as possible.</p>
+        <p>The study takes approximately 5-10 minutes.</p>
+        <hr>
+        <h3>Eligibility Criteria (please check all that apply):</h3>
+        <ul>
+            <li>I am 18 years of age or older.</li>
+            <li>I am fluent in English.</li>
+            <li>I have normal or corrected-to-normal hearing.</li>
+            <li>I am using a computer (not a phone or tablet).</li>
+        </ul>
+        <p><strong>Recommendation:</strong> Please ensure you are in a quiet environment, free from distractions, and that your device volume is turned up to a comfortable level.</p>
+    `,
+    questions: [
+        {
+            prompt: "Please confirm that you meet all of the above eligibility criteria:",
+            options: [
+                "I confirm that I meet all of the eligibility criteria listed above." // have to click to move on if meet eligibility
+            ],
+            required: true
+        }
+    ],
+    on_finish: function(data) {
+        const responses = data.response.Q0;
+        console.log("Eligibility confirmation:", responses);
+  
+    }
+};
+
+    //  Consent/ethics Form 
+const consent = {
+    type: jsPsychSurveyMultiChoice,
+    preamble: `
+        <h2>Consent Form</h2>
+        <p><strong>Important Note:</strong> This study is not approved for use as formal research. 
+        It has been created for the <strong>PNB 3EE3</strong> course as a private project and is not associated with any research ethics board.</p>
+        <p>Participation is voluntary. You may stop at any time without penalty. No personally identifying information will be collected.</p>
+        <p>You will be asked to memorize words under different background sound conditions and later recall them. 
+        Your data will be stored temporarily for the purpose of practicing experimental design and analysis.</p>
+        <p><strong>Please select one of the following options to indicate your level of consent:</strong></p>
+    `,
+    questions: [
+        {
+            prompt: "Please indicate your choice below:", // consent choice
+            options: [
+                "I agree to participate and allow my data to be used for educational purposes.",
+                "I DO NOT agree to participate in the experiment"
+            ],
+            required: true
+        }
+    ],
+    on_finish: function(data) {
+        const response = data.response.Q0;
+        console.log("Consent choice:", response); // save choice
+        
+        // require them to respond to a consent option
+        if (!response) {
+            jsPsych.endExperiment("You must consent to continue.");
+        }
+
+        // If participant does NOT agree, close window/stop experiment
+        if (response === "I DO NOT agree to participate in the experiment") {
+            alert("You have chosen not to participate. The window will now close.");
+            window.close(); // Attempt to close tab
+            jsPsych.endExperiment("You chose not to participate. The experiment has ended."); // Fallback if window doesn't close
+        }
+    }
+};
+
+    
+    // practice task intro
+    const practiceIntro = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: `<h3>It's time to practice!</h3><p>You will now complete a short practice to get familiar with the task. Click 'Start Practice' when you're ready.</p>`,
+        choices: ['Start Practice']
+    };
+// practice task
+    const practiceWords = ['Dog', 'Car', 'Tree']; //remember these words
+    const practiceStudyPhase = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: `<h3>Practice: Memorize these words (20 sec).</h3><div>${practiceWords.join('<br>')}</div>`,
+        choices: [],
+        trial_duration: 20000 // 20  secondd timer for practice
+    };
+
+// text box to recall the words and continue button for when done recalling
+    const practiceRecall = {
+        type: jsPsychSurveyText,
+        questions: [{ prompt: 'Practice: Type all words you remember. Seperate the words with commas, and use captial letters to start each word.', rows: 3, columns: 40 }],
+        button_label: "Continue"
+    };
+// start of the real task
+    const startRealTask = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: `<h3>Practice complete! Ready to start the real task.</h3><p>Click 'Start' to begin.</p>`,
+        choices: ['Start']
+    };
+    
+    // Word list
+    const words = ['Apple', 'Table', 'River', 'Cloud', 'Pencil', 'Garden', 'Mirror', 'Ocean', 'Guitar', 'Window', 'Broom', 'Pants'];
+    const wordListHTML = words.map(word => `<p>${word}</p>`).join(" "); // Convert word list into HTML string for display
+    //'wordListHTML' formats each word inside <p> tags to display them as separate lines in HTML.
+
+
+    // Study phase: Show all words + Play audio/silence for 1 min
+    let audio;
+   const studyPhase = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: `
+        <h3>Memorize these words. You have 1 minute to do so.</h3>
+        <div>${wordListHTML}</div>
+        
+    `, // Instruction on top, words below
+    choices: [], // No buttons to press
+    trial_duration: 60000, // 1 minute
+    on_start: function () { // When the trial starts, play background audio if the condition is not 'silence'
+        if (assignedCondition !== 'silence') {
+            audio = new Audio(assignedCondition + '.mp3'); // Load the assigned audio file (music or white_noise)
+            audio.loop = true; // Repeat audio if shorter than 1 min
+            audio.play(); // play the audio
+        }
+    }, //When the trial ends, stop and reset the audio (if it was playing)
+    on_finish: function () {
+        if (assignedCondition !== 'silence') {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+    }
+};
+
+    // Distractor task (simple math problems)
+  const distractorTask = {
+    type: jsPsychSurveyHtmlForm, // Uses HTML form plugin to allow number input fields
+    preamble: '<h3>Please solve all of the following math problems. You must enter a number for each to continue.</h3>', //Instructions shown to participants
+   // List of math problems displayed as input fields (only can enter numbers into the boxes, required to continue)
+    html: ` 
+        <label>What is 12 + 7? <input name="q1" type="number" required></label><br><br>
+        <label>What is 5 × 3? <input name="q2" type="number" required></label><br><br>
+        <label>What is 20 / 5? <input name="q3" type="number" required></label><br><br>
+        <label>What is 33 + 55? <input name="q4" type="number" required></label><br><br>
+        <label>What is 44 - 8? <input name="q5" type="number" required></label><br><br>
+        <label>What is 9 × 7? <input name="q6" type="number" required></label><br><br>
+        <label>What is 36 / 4? <input name="q7" type="number" required></label><br><br>
+    `,
+    button_label: 'Continue'
+};
+
+// waiting condition
+const delayBeforeRecall = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: function() {
+        // Set up the timer display area, HTML content to show participants while they wait
+        return `
+            <h3>Please wait for 1 minute before recalling the words.</h3>
+            <h2 id="timer">1:00</h2>  <!-- Timer display initialized at 1 minute -->
+        `;
+    },
+    choices: "NO_KEYS", // No input allowed
+    trial_duration: 60000, // wait for 1 minute
+
+    // Function to handle the countdown display
+    on_start: function() {
+        let timeLeft = 60; //Start from 60 seconds
+        const timerInterval = setInterval(function() {
+            timeLeft--; //Reduce time left by 1 second
+            const minutes = Math.floor(timeLeft / 60); //Calculate remaining minutes
+            const seconds = timeLeft % 60; //Calculate remaining seconds
+            const displayTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`; //Format time as min:seconds
+            document.getElementById('timer').innerText = displayTime; //Update the displayed timer every second
+
+            if (timeLeft <= 0) { //Stop timer when it reaches 0
+                clearInterval(timerInterval);
+            }
+        }, 1000); // Run this function every 1000 milliseconds (1 second)
+    }
+};
+
+// Recall task
+const recallTask = {
+    type: jsPsychSurveyText, //Using survey text plugin to collect free-text input
+    questions: [
+        {
+            prompt: "Please type all the words you remember. Start each word with a capital letter. Separate them using commas. You have as much time and space as needed.",
+            rows: 5, //Set the input box to be 5 rows tall for more writing space
+            columns: 40 // input box width
+        }
+    ],
+    button_label: "Continue", //Button label to proceed when finished typing
+    data: { task: 'recall' }, // tag this as 'recall' to pull it easily later
+    on_finish: function(data) { // runs when participant finishes this task
+        console.log('Recall Words:', data.response.Q0); // the words typed by the user stored 
+        console.log('Recall Response Time (ms):', data.rt); // Time taken to respond in milliseconds
+    }
+};
+
+// Familiarity rating (only for music condition)
+const familiarityRating = { //variable storing the familiarirty rating
+    type: jsPsychSurveyLikert, // likert scale question
+    questions: [{ prompt: 'How familiar did you find the background music?', labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'] }], //question and likert scale
+    data: { task: 'familiarity', condition: assignedCondition }, // tag as 'familiarity'
+    on_finish: function (data) {
+        if (assignedCondition !== 'music') { // ask this question if participant was in the music condition
+            jsPsych.finishTrial();
+        }
+    }
+};
+
+   // Demographics task
+const demographics = {
+    type: jsPsychSurveyText, //HTML text to answer the demographic questions
+    questions: [
+        { prompt: 'Age:' },
+        { prompt: 'Gender:' },
+        { prompt: 'Do you regularly listen to music while studying? (Yes/No)' }
+    ],
+    data: { task: 'demographics' } // Tag this as 'demographics'
+};
+
+//debrief screen after experiment is done
+    const debrief = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: `<h3>Debrief</h3><p>Thank you for participating in this study. The purpose of this experiment is to explore how different types of background noise affect memory recall/studying! You were randomly assigned to hear either music, white noise, or silence while memorizing a list of words. This study is for educational purposes only and is not approved for formal research. Your participation helps us better understand how environmental sounds or music may influence studying and memory.</p><p>If you have any questions, please email beshayj@mcmaster.ca. Click 'continue' to complete the study and see your results.</p>`,
+        choices: ['Continue'] //finish study
+    };
+
+// Results Screen
+const resultsScreen = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: function () {
+        // Get recall data (their typed words + time they took to recall)
+        const recallData = jsPsych.data.get().filter({ task: 'recall' }).first(1).values()[0]; // the recalled words by participant 
+        const recallResponse = recallData.response.Q0 || "No response given"; // if nothing was typed in recall condition
+        const recallRT = recallData.rt ? (recallData.rt / 1000).toFixed(2) + " seconds" : "N/A"; // Time in seconds
+
+        // Get demographics data (age, gender, music habit)
+        const demographicsData = jsPsych.data.get().filter({ task: 'demographics' }).first(1).values()[0].response; //display as demographics on results screen
+        const age = demographicsData.Q0 || "N/A"; //what they put as age
+        const gender = demographicsData.Q1 || "N/A"; //what they put as gender
+        const musicHabit = demographicsData.Q2 || "N/A"; //if they answered yes or no to if they listen to music often while studying
+
+        // if participant was in the music condition, display their familiarity rating of the music that they rated earlier
+        let familiarityDisplay = "";
+        if (assignedCondition === 'music') {
+            const familiarityData = jsPsych.data.get().filter({ task: 'familiarity' }).first(1).values()[0];
+            const familiarity = familiarityData.response.Q0 !== undefined ? (parseInt(familiarityData.response.Q0) + 1) : "N/A";
+            familiarityDisplay = `<p><strong>Your familiarity rating of the music:</strong> ${familiarity}/10</p>`; //display the rating
+        }
+
+        // display all the Correct words 
+        const correctWords = "Apple, Table, River, Cloud, Pencil, Garden, Mirror, Ocean, Guitar, Window, Broom, Pants";
+
+        // Display everything cleanly
+        return `
+            <h3>Thank you for participating!</h3>
+            <p><strong>Your recalled words:</strong> ${recallResponse}</p>
+            <p><strong>Time taken to recall:</strong> ${recallRT}</p>
+            <p><strong>Your demographics:</strong><br>
+               Age: ${age} <br>
+               Gender: ${gender} <br>
+               Do you listen to music while studying: ${musicHabit}</p>
+            ${familiarityDisplay} <!-- Only shown if music condition -->
+            <p><strong>Correct words were:</strong> ${correctWords}</p>
+        `;
+    }, 
+    choices: ['Finish'], // End the experiment
+    on_finish: function () {
+        // filter and save important data only to the csv file
+        jsPsych.data.get().filterCustom(function(trial) {
+            return trial.task === 'recall' || trial.task === 'demographics' || trial.task === 'familiarity';
+        }).localSave('csv', 'PNB3EE3_filtered_data.csv'); //when they click finish it downloads their data as a csv file
+    }
+};
+
+// run the pages in this order
+   let timeline = [
+    conditionTrial, preload, welcome, consent, practiceIntro, practiceStudyPhase, practiceRecall,
+    startRealTask, studyPhase, distractorTask, delayBeforeRecall, recallTask, demographics, debrief
+];
+
+
+// Add familiarity only if music condition
+if (assignedCondition === 'music') timeline.push(familiarityRating);
+
+// Always add results screen
+timeline.push(resultsScreen);
+
+    // Run experiment
+
+jsPsych.run(timeline);
+
+</script>
+</body>
+</html>
