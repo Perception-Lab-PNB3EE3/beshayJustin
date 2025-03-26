@@ -1,0 +1,327 @@
+---
+title: "Analysis_BESHAY_PNB3EE3"
+author: "Justin Beshay"
+date: "2025-03-26"
+output: html_document
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+# Load required packages
+library(ggplot2)
+library(readr)
+library(stats)
+library(tidyverse)
+library(dplyr)
+library(rstatix)
+library(ggpubr)
+library(effectsize)
+```
+
+## 1. Introduction
+
+This analysis examines whether different background noise conditions (Silence, White Noise, Music) affect memory recall performance. The primary dependent variable is recall accuracy. Secondary variables include recall time, music familiarity (music condition only), and study habits.
+
+## 2. Simulate Data
+
+```{r}
+set.seed(123) # Set seed for reproducibility
+sample_size <- 177
+conditions <- c("silence", "white_noise", "music")
+music_habits <- c("Yes", "No")
+
+# Randomly assign participants to conditions
+condition_assignments <- rep(conditions, each = sample_size / 3)
+condition_assignments <- sample(condition_assignments, replace = FALSE)
+
+# Create initial data frame
+# MusicFamiliarity is only meaningful for the music condition
+# RecallAccuracy and RecallRT are generated with realistic means & SDs per condition
+df <- data.frame(
+  Participant = 1:sample_size,
+  Condition = condition_assignments,
+  RecallAccuracy = NA,
+  RecallRT = NA,
+  MusicFamiliarity = NA,
+  MusicHabit = sample(music_habits, size = sample_size, replace = TRUE),
+  stringsAsFactors = TRUE
+)
+# Generate scores by condition
+for (i in 1:nrow(df)) {
+  cond <- df$Condition[i]
+  if (cond == "silence") {
+    df$RecallAccuracy[i] <- round(rnorm(1, mean = 75, sd = 10), 1)
+  } else if (cond == "white_noise") {
+    df$RecallAccuracy[i] <- round(rnorm(1, mean = 65, sd = 10), 1)
+  } else if (cond == "music") {
+    df$RecallAccuracy[i] <- round(rnorm(1, mean = 55, sd = 10), 1)
+    df$MusicFamiliarity[i] <- sample(1:10, 1)
+  }
+  df$RecallRT[i] <- round(rnorm(1, mean = 50, sd = 10), 1)
+}
+# Save for loading later
+write.csv(df, "PNB3EE3_simulated_data_177.csv", row.names = FALSE)
+```
+
+## 3. Clean and Format Data
+
+```{r}
+df <- read.csv("PNB3EE3_simulated_data_177.csv") # Load and prepare data
+
+df$Condition <- as.factor(df$Condition)
+df$MusicHabit <- as.factor(df$MusicHabit)
+df$MusicFamiliarity <- as.numeric(df$MusicFamiliarity)
+df$RecallAccuracy <- pmin(pmax(df$RecallAccuracy, 0), 100) # Clip recall accuracy to [0,100] in case of outliers
+```
+
+## 4. Descriptive Statistics
+
+```{r}
+# Overall Descriptive Stats
+summary(df)
+
+# Recall Accuracy by Condition, # Mean, SD, Min, Max Recall Accuracy by Condition
+df %>%
+  group_by(Condition) %>%
+  summarise(
+    Mean_Recall = round(mean(RecallAccuracy, na.rm = TRUE), 2),
+    SD_Recall = round(sd(RecallAccuracy, na.rm = TRUE), 2),
+    Min_Recall = round(min(RecallAccuracy, na.rm = TRUE), 2),
+    Max_Recall = round(max(RecallAccuracy, na.rm = TRUE), 2),
+    n = n()
+  )
+
+# Recall Response Time by Condition
+df %>%
+  group_by(Condition) %>%
+  summarise(
+    Mean_RT = round(mean(RecallRT, na.rm = TRUE), 2),
+    SD_RT = round(sd(RecallRT, na.rm = TRUE), 2)
+  )
+
+# Music Familiarity (Music Only)
+df %>%
+  filter(Condition == "music") %>%
+  summarise(
+    Mean_Familiarity = round(mean(MusicFamiliarity, na.rm = TRUE), 2),
+    SD_Familiarity = round(sd(MusicFamiliarity, na.rm = TRUE), 2)
+  )
+
+# Study Habit Breakdown
+df %>%
+  group_by(MusicHabit) %>%
+  summarise(
+    MeanRecall = round(mean(RecallAccuracy), 2),
+    SDRecall = round(sd(RecallAccuracy), 2),
+    Count = n()
+  )
+```
+
+## 5. Exploratory Visualizations
+
+### 5.1 Scatter: Familiarity vs Recall (Music)
+
+```{r}
+# Scatterplot: Music Familiarity vs Recall Accuracy
+## Secondary Hypothesis: Is more familiar music more distracting?
+
+df %>%
+  filter(Condition == "music") %>%
+  ggplot(aes(x = MusicFamiliarity, y = RecallAccuracy)) +
+  geom_point(color = "purple", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Figure 1. Music Familiarity vs Recall Accuracy (Music Condition)",
+    x = "Music Familiarity (1–10)",
+    y = "Recall Accuracy (%)"
+  )
+```
+
+### 5.2 Scatter: Recall Time vs Accuracy
+
+```{r}
+#Scatterplot: Recall Time vs Recall Accuracy
+##Exploratory: Are slower participants more accurate (or not)?
+
+ggplot(df, aes(x = RecallRT, y = RecallAccuracy)) +
+  geom_point(color = "darkred", alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Figure 2. Recall Time vs Recall Accuracy (All Participants)",
+    x = "Recall Time (seconds)",
+    y = "Recall Accuracy (%)"
+  )
+```
+
+### 5.3 Study Habit Distribution
+
+```{r}
+# Bar Plot: Music Study Habit Frequencies
+##Demographics: How many people study with music?
+
+
+ggplot(df, aes(x = MusicHabit, fill = MusicHabit)) +
+  geom_bar() +
+  theme_minimal() +
+  labs(
+    title = "Figure 3. Frequency of Participants Who Study with Music",
+    x = "Do You Listen to Music While Studying?",
+    y = "Number of Participants"
+  )
+```
+
+### 5.4 Boxplot: Recall by Study Habit (Music Group)
+
+```{r}
+# Boxplot: Recall Accuracy by Music Habit (Music Condition Only)
+## Exploratory Moderation: Do music study habits protect recall?
+
+df %>%
+  filter(Condition == "music") %>%
+  ggplot(aes(x = MusicHabit, y = RecallAccuracy, fill = MusicHabit)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    title = "Figure 4. Recall Accuracy by Music Study Habit (Music Condition Only)",
+    x = "Studies with Music?",
+    y = "Recall Accuracy (%)"
+  )
+```
+
+## 6. Inferential Analyses
+
+### 6.1 ANOVA
+
+```{r}
+# Test for overall group differences in recall accuracy across the three conditions
+anova_model <- aov(RecallAccuracy ~ Condition, data = df)
+summary(anova_model)
+eta_squared(anova_model) # Calculate effect size (eta squared)
+```
+
+### 6.2 One-Tailed T-Tests
+
+```{r}
+# Planned comparisons to follow up the ANOVA
+# Test whether silence > music
+t.test(RecallAccuracy ~ Condition, data = df %>% filter(Condition %in% c("silence", "music")), alternative = "less")
+
+# Test whether silence > white noise
+t.test(RecallAccuracy ~ Condition, data = df %>% filter(Condition %in% c("silence", "white_noise")), alternative = "greater")
+
+# Test whether white noise > music
+t.test(RecallAccuracy ~ Condition, data = df %>% filter(Condition %in% c("white_noise", "music")), alternative = "less")
+```
+
+### 6.3 Cohen’s d
+
+```{r}
+# Estimate effect size for the difference between silence and music
+cohens_d(RecallAccuracy ~ Condition, data = df %>% filter(Condition %in% c("silence", "music")))
+```
+
+### 6.4 Correlation: Familiarity × Recall
+
+```{r}
+# Test whether recall accuracy is associated with music familiarity within the music group
+cor.test(df$RecallAccuracy[df$Condition == "music"], df$MusicFamiliarity[df$Condition == "music"])
+```
+
+### 6.5 Condition × Study Habit Interaction
+
+```{r}
+# Linear model testing interaction between condition and music study habit
+interaction_model <- lm(RecallAccuracy ~ Condition * MusicHabit, data = df)
+summary(interaction_model)
+```
+
+## 7. Final Visuals (Planned Visualizations)
+
+```{r}
+# Boxplot comparing recall accuracy distributions across the three conditions
+ggplot(df, aes(x = Condition, y = RecallAccuracy, fill = Condition)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Figuire 5. Recall Accuracy by Background Noise Condition")
+
+# Bar plot of means with standard error bars
+summary_stats <- df %>%
+  group_by(Condition) %>%
+  summarise(
+    mean_recall = mean(RecallAccuracy),
+    se_recall = sd(RecallAccuracy) / sqrt(n())
+  )
+
+ggplot(summary_stats, aes(x = Condition, y = mean_recall, fill = Condition)) +
+  geom_col(width = 0.6, colour = "black") +
+  geom_errorbar(aes(ymin = mean_recall - se_recall, ymax = mean_recall + se_recall), width = 0.2) +
+  theme_minimal() +
+  labs(title = "Figuire 6. Mean Recall Accuracy by Condition ± Standard Error", y = "Recall Accuracy (%)")
+```
+
+```{r}
+# Histogram: Recall Accuracy (All Participants)
+## Assumption Check: Is recall accuracy approximately normal?
+# Histogram of recall accuracy to check distribution shape (normality assumption)
+ggplot(df, aes(x = RecallAccuracy)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Figure 7. Distribution of Recall Accuracy (All Conditions)",
+    x = "Recall Accuracy (%)",
+    y = "Count"
+  )
+```
+```{r}
+#Histogram: Recall Response Time
+## Assumption Check & Exploratory Variable (Response Speed)
+# Histogram of response time to check its distribution
+ggplot(df, aes(x = RecallRT)) +
+  geom_histogram(binwidth = 5, fill = "darkgreen", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Figure 8. Distribution of Recall Response Time",
+    x = "Recall Time (seconds)",
+    y = "Count"
+  )
+```
+```{r}
+#Histogram: Music Familiarity (Music Condition Only)
+##Exploratory: Distribution of familiarity ratings (1–10)
+
+df %>%
+  filter(Condition == "music") %>%
+  ggplot(aes(x = MusicFamiliarity)) +
+  geom_histogram(binwidth = 1, fill = "orchid", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Figure 9. Distribution of Music Familiarity Ratings (Music Condition)",
+    x = "Familiarity Rating (1–10)",
+    y = "Count"
+  )
+```
+
+
+## 8. Conclusion
+- The silence condition produced the highest recall accuracy, supporting the primary hypothesis that background noise negatively affects memory performance. As shown in Figure 6, participants in the silence condition had a mean recall accuracy of 74.47%, which was significantly higher than both the white noise group (M = 65.91%) and the music group (M = 56.33%). Although the standard error bars in Figure 5 show some overlap, When including standard error, the bars dont overlap (Figuire 6). These differences were statistically confirmed by a one-way ANOVA (F(2, 174) = 52.26, p < .001, η² = .38) and follow-up t-tests:
+
+  - Silence > Music: t(114.19) = –10.35, p < .001 (one-tailed)
+
+  - Silence > White Noise: t(114.75) = 4.94, p < .001 (one-tailed)
+
+  - White Noise > Music: t(115.95) = –5.21, p < .001 (one-tailed)
+
+- Contrary to expectations, music familiarity was not significantly correlated with recall accuracy within the music condition (r = .11, p = .42), suggesting that greater familiarity with a song did not meaningfully impact memory performance.
+
+- An exploratory interaction model was used to test whether music study habits moderated the effect of background noise on recall accuracy. The overall model was statistically significant, F(5, 171) = 21.68, *p* < .001, with an R² of .388, meaning the model explained about 39% of the variance in recall performance. However, the interaction terms were not statistically significant:
+
+  - Silence × MusicHabit: β = –0.53, p = .88  
+  - White Noise × MusicHabit: β = 3.49, p = .34  
+
+  - These p-values are well above .05, suggesting that the impact of background noise on recall was consistent regardless of whether participants usually study with music.
+
+- Future research should expand on these findings by including delayed recall, directly manipulating music familiarity or complexity, and comparing lyrical vs. instrumental music to better understand the specific features of music that disrupt or facilitate memory.
+
+
+
